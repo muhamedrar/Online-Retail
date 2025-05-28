@@ -22,11 +22,11 @@ def preprocess_data(df):
     if df is None:
         print("Error: DataFrame is None. Please check the data loading process.")
         return None
-    
+    df = df[~df['InvoiceNo'].str.startswith('C')] # Remove cancelled orders
     df.dropna(inplace=True)
     df.drop_duplicates(inplace=True)
     
-    df = df[~df['InvoiceNo'].str.startswith('C')] # Remove cancelled orders
+    
     df = df.copy()
     df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
     df = feature_engineering(df)
