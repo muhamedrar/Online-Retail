@@ -4,14 +4,14 @@ def load_data(file_path, with_cluster = False):
 
     try:
         if with_cluster == False:
-            columns = ['InvoiceNo', 'StockCode', 'Description', 'Quantity', 'InvoiceDate', 'UnitPrice', 'CustomerID', 'Country']
             types = {'InvoiceNo': str, 'StockCode': str, 'Description': str, 'Quantity': int, 'InvoiceDate': str, 'UnitPrice': float, 'CustomerID': float, 'Country': str}
-            data = pd.read_csv(file_path,columns=columns, dtype=types)
+            data = pd.read_csv(file_path, dtype=types)
+            
             return data
         else:
-            columns = ['InvoiceNo', 'StockCode', 'Description', 'Quantity', 'InvoiceDate', 'UnitPrice', 'CustomerID', 'Country','cluster']
-            types = {'InvoiceNo': str, 'StockCode': str, 'Description': str, 'Quantity': int, 'InvoiceDate': str, 'UnitPrice': float, 'CustomerID': float, 'Country': str, 'cluster' : int}
-            data = pd.read_csv(file_path,columns=columns, dtype=types)
+            data = pd.read_csv(file_path, dtype=types)
+           
+            data = pd.read_csv(file_path, dtype=types)
             return data
     except Exception as e:
         print(f"Error loading data: {e}")
@@ -19,11 +19,19 @@ def load_data(file_path, with_cluster = False):
     
 
 def preprocess_data(df):
+    if df is None:
+        print("Error: DataFrame is None. Please check the data loading process.")
+        return None
     
     df.dropna(inplace=True)
     df.drop_duplicates(inplace=True)
+    
     df = df[~df['InvoiceNo'].str.startswith('C')] # Remove cancelled orders
-    df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'], format='%Y-%m-%d %H:%M:%S')
+    df = df.copy()
+    df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
+    df = feature_engineering(df)
+    print(f"preprocess_data done with shape: {df.shape}")
+
     return df
 
 
