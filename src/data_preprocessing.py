@@ -1,17 +1,20 @@
 import pandas as pd
 
 def load_data(file_path, with_cluster = False):
-
+    print(f"Loading data from {file_path} with cluster={with_cluster}")
     try:
         if with_cluster == False:
-            types = {'InvoiceNo': str, 'StockCode': str, 'Description': str, 'Quantity': int, 'InvoiceDate': str, 'UnitPrice': float, 'CustomerID': float, 'Country': str}
-            data = pd.read_csv(file_path, dtype=types)
+            types = {'InvoiceNo': str, 'StockCode': str, 'Description': str, 'Quantity': int, 'InvoiceDate': str, 'UnitPrice': float, 'CustomerID': 'float64', 'Country': str}
+            data = pd.read_csv(file_path, dtype=types, na_values=['', 'NaN', 'nan'])
             
             return data
         else:
-            types = {'InvoiceNo': str, 'StockCode': str, 'Description': str, 'Quantity': int, 'InvoiceDate': str, 'UnitPrice': float, 'CustomerID': float, 'Country': str, 'cluster': int}
-            data = pd.read_csv(file_path, dtype=types)
+            types = {'InvoiceNo': str, 'StockCode': str, 'Description': str, 'Quantity': int, 'InvoiceDate': str, 'UnitPrice': float, 'CustomerID': 'float64', 'Country': str, 'cluster': int}
+            data = pd.read_csv(file_path, dtype=types, na_values=['', 'NaN', 'nan'])
+            print(f"Data loaded successfully as clustered")
+            print(f"Data shape: {data.shape}")
             return data
+        
     except Exception as e:
         print(f"Error loading data: {e}")
         return None

@@ -11,37 +11,33 @@ warnings.filterwarnings("ignore")
 
 def prep_data_for_sales_forecasting(file_path, cluster=None,  rolling_window=7, decomposition_period=7):
 
-    
+    print(f"executing prep_data_for_sales_forecasting with file_path: {file_path}, cluster: {cluster}, rolling_window: {rolling_window}, decomposition_period: {decomposition_period}")
    
     if cluster is not None:
+        print("Loading data with clustering enabled.")
+          
+
         df = load_data(file_path, with_cluster=True)
-        if df is None:
-            print("Failed to load data.")
-        return None, None, None
-    else:
-        # Load data without cluster
-        df = load_data(file_path, with_cluster=False)
-        if df is None:
-            print("Failed to load data.")
-            return None, None, None
-        df = df[df['cluster'] == cluster].copy()
-    
-
-    # Filter by cluster if specified
-   
+        print(f"Data loaded with shape: {df.shape}")
+        df = df[df['cluster'] == cluster].copy
+        print('filtered data')
         
-
-    # Preprocess and engineer features
-    
+        
+    else:
+        print("Loading data with clustering disabled.")
+        df = load_data(file_path, with_cluster=False)
+        
+ 
+    print(f"before preprocessing, data shape: {df.shape}")
     df = preprocess_data(df)
     
     df = feature_engineering(df)
 
-    # Remove outliers
+    
     df = remove_outliers(df, 'Quantity')
     df = remove_outliers(df, 'UnitPrice')
     df = remove_outliers(df, 'UnitPrice')
-
+    print(f"removed outliers and feature_engineering and preprocess_data, data shape: {df.shape}")
 
     # Aggregate and smooth data
     df = df.groupby(df['InvoiceDate'].dt.date)['TotalPrice'].sum().to_frame()
@@ -50,7 +46,7 @@ def prep_data_for_sales_forecasting(file_path, cluster=None,  rolling_window=7, 
     # Seasonal decomposition
     decomposition_smooth = seasonal_decompose(df, model='additive', period=decomposition_period)
     
-
+    print(f"Data prepared for sales forecasting with shape: {df.shape}")
     return decomposition_smooth.trend.dropna(), decomposition_smooth.seasonal.dropna(), decomposition_smooth.resid.dropna()
 
 
@@ -63,7 +59,7 @@ class SalesForecaster:
     def __init__(self, filePath, order=(0, 1, 1), seasonal_order=(2, 0, [1, 2], 7),cluster=None):
         trend, seasonal, resid = prep_data_for_sales_forecasting(filePath, cluster=cluster)
         self.trend = trend.dropna()
-        self.seasonal = seasonal
+        self.seasonal = seasonal.dropna()
         self.resid = resid.dropna()
         self.model = ARIMA(self.resid, order=order, seasonal_order=seasonal_order)
         self.fitted_model = self.model.fit()
@@ -92,5 +88,5 @@ class SalesForecaster:
 
 
 
-forecaster = SalesForecaster('./Data/Online_Retail.csv',cluster=2)
+forecaster = SalesForecaster('./Data/Online_Retail_Clustered.csv',cluster=True)
 
