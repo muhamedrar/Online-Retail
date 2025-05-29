@@ -9,8 +9,7 @@ def load_data(file_path, with_cluster = False):
             
             return data
         else:
-            data = pd.read_csv(file_path, dtype=types)
-           
+            types = {'InvoiceNo': str, 'StockCode': str, 'Description': str, 'Quantity': int, 'InvoiceDate': str, 'UnitPrice': float, 'CustomerID': float, 'Country': str, 'cluster': int}
             data = pd.read_csv(file_path, dtype=types)
             return data
     except Exception as e:
@@ -23,11 +22,11 @@ def preprocess_data(df):
         print("Error: DataFrame is None. Please check the data loading process.")
         return None
     df = df[~df['InvoiceNo'].str.startswith('C')] # Remove cancelled orders
-    df.dropna(inplace=True)
-    df.drop_duplicates(inplace=True)
+    df.dropna(inplace=True) # Remove rows with NaN values
+    df.drop_duplicates(inplace=True) # Remove duplicate rows
     
     
-    df = df.copy()
+    
     df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
     df = feature_engineering(df)
     print(f"preprocess_data done with shape: {df.shape}")

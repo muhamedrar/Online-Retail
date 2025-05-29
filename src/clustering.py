@@ -14,7 +14,7 @@ def prep_data_for_clustering(df):
     
     df = preprocess_data(df)
     df = feature_engineering(df)
-    df = remove_outliers(df, 'TotalPrice')
+    df = remove_outliers(df, 'UnitPrice')
     df = remove_outliers(df, 'Quantity') 
     df = remove_outliers(df, 'UnitPrice')
     
@@ -35,10 +35,17 @@ def prep_data_for_clustering(df):
 def perform_clustering(df, n_clusters=5):
     print(f"Starting clustering with {n_clusters} clusters...")
     preCluster,data = prep_data_for_clustering(df)
-    
     # Perform KMeans clustering
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
     labels = kmeans.fit_predict(preCluster)
+    data = load_data('./Data/Online_Retail.csv', with_cluster=False)
+    data = preprocess_data(data)
+    data = feature_engineering(data)
+    
+    data = remove_outliers(data, 'Quantity')
+    data = remove_outliers(data, 'UnitPrice')
+    data = remove_outliers(data, 'UnitPrice')
+
     data['cluster'] = labels
     print(f"perform_clustering done with {n_clusters} clusters.")
     return data
