@@ -3,11 +3,29 @@ from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import sys
 import os
-
+import configparser
 # Add the parent directory of 'src' to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
+import warnings
+warnings.filterwarnings("ignore")
 from src.data_preprocessing import remove_outliers , preprocess_data, load_data ,feature_engineering
+
+
+config = configparser.ConfigParser()
+config.read('./config.ini')
+
+if 'KmeansClustering' in config and \
+   all(k in config['KmeansClustering'] for k in ['n_clusters', 'data_import_path', 'data_export_path']):
+    n_clusters = config['KmeansClustering'].getint('n_clusters')
+    data_import_path = config['KmeansClustering']['data_import_path']
+    data_export_path = config['KmeansClustering']['data_export_path']
+else:
+    # Provide default values or raise an error
+    print("KmeansClustering section not found in config.ini or missing keys. Using default values.")
+    n_clusters = 5
+    data_import_path = './Data/Online_Retail.csv'
+    data_export_path = './Data/Clustered_Online_Retail.csv'
+
 
 
 def prep_data_for_clustering(df):
@@ -32,7 +50,7 @@ def prep_data_for_clustering(df):
 
 
 
-def perform_clustering(df, n_clusters=5):
+def perform_clustering(df, n_clusters=n_clusters):
     print(f"Starting clustering with {n_clusters} clusters...")
     preCluster,data = prep_data_for_clustering(df)
     # Perform KMeans clustering
@@ -53,9 +71,9 @@ def perform_clustering(df, n_clusters=5):
 
 
 
-df = load_data('./Data/Online_Retail.csv',with_cluster = False)
-data = perform_clustering(df, n_clusters=5)
-data.to_csv('./Data/Online_Retail_Clustered.csv', index=False)
+df = load_data(data_import_path,with_cluster = False)
+data = perform_clustering(df, n_clusters=n_clusters)
+data.to_csv(data_export_path, index=False)
 
 
 
