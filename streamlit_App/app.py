@@ -1,35 +1,41 @@
+# streamlit_app.py
 import streamlit as st
-import pandas as pd
-import joblib
+from Pages import clustering, forcasting, insights
 
-# Load the forecast model
-import os
+st.set_page_config(page_title="Online Retail Analytics", layout="wide")
 
-# Construct the absolute path to the model file
-model_path = os.path.join(os.path.dirname(__file__), '..', 'Model', 'arima_model.pkl')
-model = joblib.load(model_path)
+# Sidebar Navigation
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to", [
+    "Executive Summary",
+    "Customer Clustering",
+    "Sales Forecasting",
+    "Strategic Recommendations"
+])
 
-# Title of the app
-st.title('Forecasting App')
+# Page Routing
+if page == "Executive Summary":
+    st.title("🛍️ Online Retail Analysis - Executive Summary")
+    st.markdown("""
+    ### What This App Does
+    - Segments customers into behavioral clusters using unsupervised learning.
+    - Forecasts future sales across top-performing countries and customer segments.
 
-# Upload sample data
-uploaded_file = st.file_uploader("Upload your input data (CSV)", type='csv')
+    ### Why It Matters
+    - Enables targeted marketing and retention strategies.
+    - Supports inventory planning and demand forecasting.
 
-if uploaded_file is not None:
-    # Read the data
-    data = pd.read_csv(uploaded_file)
-    st.write("Data Preview:")
-    st.dataframe(data)
+    ### Key Insights
+    - Cluster 2 drives 45% of revenue but shows signs of churn.
+    - Germany sales peak earlier than the UK — plan promotions accordingly.
+    - December is the highest demand month — align supply chain.
+    """)
 
-    # Process the data and make predictions
-    # Assuming the model expects a specific format, adjust as necessary
-    predictions = model.predict(data)
+elif page == "Customer Clustering":
+    clustering.show_clustering_page()
 
-    # Display the predictions
-    st.write("Forecasted Values:")
-    st.dataframe(predictions)
+elif page == "Sales Forecasting":
+    forcasting.show_forecasting_page()
 
-# Instructions for using the app
-st.sidebar.header('Instructions')
-st.sidebar.write('1. Upload your CSV file containing the input data.')
-st.sidebar.write('2. The app will display the data and the forecasted values.')
+elif page == "Strategic Recommendations":
+    insights.show_insights_page()

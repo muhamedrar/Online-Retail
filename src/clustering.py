@@ -73,7 +73,19 @@ def perform_clustering(df, n_clusters=n_clusters):
 
 df = load_data(data_import_path,with_cluster = False)
 data = perform_clustering(df, n_clusters=n_clusters)
+#map clusters names
+Cluster_names = {
+    0: 'Regular Shoppers',
+    1: 'Premium Shoppers',
+    2: 'WholeSale Buyers',
+    3: 'Core Shoppers',
+    4: 'Budget Shoppers',
+}
+data['cluster'] = data['cluster'].map(Cluster_names)
 data.to_csv(data_export_path, index=False)
+
+
+
 
 
 

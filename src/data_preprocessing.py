@@ -9,7 +9,7 @@ def load_data(file_path, with_cluster = False):
             
             return data
         else:
-            types = {'InvoiceNo': str, 'StockCode': str, 'Description': str, 'Quantity': int, 'InvoiceDate': str, 'UnitPrice': float, 'CustomerID': 'float64', 'Country': str, 'cluster': int}
+            types = {'InvoiceNo': str, 'StockCode': str, 'Description': str, 'Quantity': int, 'InvoiceDate': str, 'UnitPrice': float, 'CustomerID': 'float64', 'Country': str, 'cluster': str}
             data = pd.read_csv(file_path, dtype=types, na_values=['', 'NaN', 'nan'])
             print(f"Data loaded successfully as clustered")
             print(f"Data shape: {data.shape}")
