@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from data_preprocessing import load_data
 import warnings
 warnings.filterwarnings("ignore")
-
+import numpy as np
 @st.cache_data
 def load_and_prepare_data(file_path):
     """Load and preprocess the dataset."""
@@ -135,8 +135,11 @@ import plotly.express as px
 import streamlit as st
 
 def render_pie_chart(filtered_summary):
-    """Render a stylish larger pie chart with left-aligned heading."""
+    """Render a stylish larger pie chart with dark-mode-friendly markdown heading, centered."""
     better_colors = px.colors.qualitative.Pastel + px.colors.qualitative.Set2
+
+    # Centered markdown heading (works in dark mode)
+    st.markdown("<h4 style='text-align:center;'>Revenue Contribution by Segment</h4>", unsafe_allow_html=True)
 
     pie_fig = px.pie(
         filtered_summary.reset_index(),
@@ -158,12 +161,6 @@ def render_pie_chart(filtered_summary):
     )
 
     pie_fig.update_layout(
-        title=dict(
-            text='Revenue Contribution by Segment',
-            x=0.5,  # Center align
-            xanchor='center',
-            font=dict(size=20, family='Arial', color='#333')
-        ),
         legend=dict(
             orientation='h',
             yanchor='bottom',
@@ -174,9 +171,9 @@ def render_pie_chart(filtered_summary):
         ),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=10, r=10, t=90, b=60),
+        margin=dict(l=10, r=10, t=30, b=60),
         showlegend=True,
-        height=480,  # Make the pie chart bigger
+        height=480,
         width=None
     )
 
@@ -184,14 +181,66 @@ def render_pie_chart(filtered_summary):
 
 
 def render_sub_kpi_cards(filtered_summary):
-    """Render sub-KPI cards for avg price and quantity per transaction."""
+    """Render sub-KPI cards for avg price and quantity per transaction with custom styling."""
     avg_price_per_transaction = filtered_summary['Avg price per transaction'].mean()
     avg_quantity_per_transaction = filtered_summary['Avg quantity per transaction'].mean()
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Avg Price per Transaction", f"${avg_price_per_transaction:,.2f}")
-    with col2:
-        st.metric("Avg Quantity per Transaction", f"{avg_quantity_per_transaction:,.2f}")
+
+    st.markdown("""
+        <style>
+            .sub-kpi-row {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: stretch;
+                gap: 16px;
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            .sub-kpi-card {
+                background: linear-gradient(135deg, #f8fafc 50%, #e0e7ef 100%);
+                border-radius: 10px;
+                padding: 0.75rem 0.5rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+                text-align: center;
+                flex: 1 1 0;
+                min-width: 0;
+            }
+            .sub-kpi-card:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            }
+            .sub-kpi-label {
+                font-size: 0.95rem;
+                font-weight: 500;
+                color: #64748b;
+                margin-bottom: 0.4rem;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
+            .sub-kpi-value {
+                font-size: 1.4rem;
+                font-weight: 700;
+                color: #1e293b;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown(
+        f'''
+        <div class="sub-kpi-row">
+            <div class="sub-kpi-card">
+                <div class="sub-kpi-label">Avg Price per Transaction</div>
+                <div class="sub-kpi-value">${avg_price_per_transaction:,.2f}</div>
+            </div>
+            <div class="sub-kpi-card">
+                <div class="sub-kpi-label">Avg Quantity per Transaction</div>
+                <div class="sub-kpi-value">{avg_quantity_per_transaction:,.2f}</div>
+            </div>
+        </div>
+        ''',
+        unsafe_allow_html=True
+    )
 
 def render_line_chart(filtered_df, selected_segments, start_date, end_date):
     """Render line chart for sales over time by segment with shaded area matching segment colors."""
@@ -315,7 +364,8 @@ def render_bar_charts(filtered_summary, selected_metrics):
                     name=title,
                     orientation='h',
                     marker=dict(line=dict(width=1)),
-                    hovertemplate=hovertemplate
+                    hovertemplate=hovertemplate,
+                    textfont=dict(color='white', size=20)  # Set text color to white and bigger font
                 ),
                 row=row, col=col_pos
             )
@@ -412,7 +462,7 @@ def show_clustering_page():
         <style>
         /* Download button */
         .stDownloadButton>button {
-            background-color: #2563eb; /* --download-bg */
+            background-color: rgb(255, 75, 75);
             color: white;
             border-radius: 8px;
             padding: 0.75rem 1.5rem;
@@ -430,9 +480,10 @@ def show_clustering_page():
             font-size: 1rem;
         }
         .stDownloadButton>button:hover {
-            background-color: #1d4ed8; /* --download-hover */
+            background-color: #b91c1c; /* dark red on hover */
+            color: white !important;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.10); /* --shadow */
+            box-shadow: 0 4px 12px rgba(185, 28, 28, 0.10); /* red shadow */
         }
         .stDownloadButton>button:focus {
             outline: none;
