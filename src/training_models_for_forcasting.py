@@ -23,7 +23,7 @@ for c in cluster_labels:
     forecaster = SalesForecaster('./Data/Online_Retail_Clustered.csv', cluster=c)
     
     # export model
-    with open(f'./Models/sales_forecaster_cluster_{c}.pkl', 'wb') as f:
+    with open(f'./Models/sales_forecaster_cluster_{c.replace(' ', '_')}.pkl', 'wb') as f:
         pickle.dump(forecaster, f)
     print(f"Model for cluster {c} trained and saved.")
 
