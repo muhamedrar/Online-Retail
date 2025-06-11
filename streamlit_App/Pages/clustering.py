@@ -396,7 +396,7 @@ def show_clustering_page():
     st.title("Customer Segmentation Dashboard")
 
     # Load and prepare data
-    df = load_and_prepare_data("./Data/Online_Retail_Clustered.csv")
+    df = load_and_prepare_data("../Data/Online_Retail_Clustered.csv")
 
     # Place date selector in the sidebar for better UX and to save horizontal space
     with st.sidebar:
