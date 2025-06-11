@@ -1,0 +1,232 @@
+/* Define CSS variables for consistent theming */
+:root {
+    --primary-bg: #f8fafc; /* Light, clean background */
+    --secondary-bg: #ffffff; /* White for sections */
+    --primary-text: #1e293b; /* Dark slate for text */
+    --secondary-text: #64748b; /* Muted slate for labels */
+    --accent: #4f46e5; /* Vibrant indigo for primary actions */
+    --accent-hover: #4338ca; /* Darker indigo for hover */
+    --download-bg: #e11d48; /* Bold rose for download button */
+    --download-hover: #be123c; /* Darker rose for hover */
+    --border: #e2e8f0; /* Light border for inputs */
+    --shadow: rgba(0, 0, 0, 0.05);
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Main container */
+.main {
+    background-color: var(--primary-bg);
+    padding: 2rem 0 2rem 2rem; /* Remove right padding */
+    border-radius: 12px;
+    box-shadow: 0 4px 16px var(--shadow);
+    margin: 1rem 0;
+}
+
+/* Section containers */
+.section {
+    background-color: var(--secondary-bg);
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px var(--shadow);
+    margin-bottom: 1.5rem;
+}
+
+/* KPI cards */
+.kpi-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0;
+    width: 25%;
+    justify-content: space-between;
+    padding-right: 0 !important; /* Remove right padding */
+    margin-right: 0 !important; /* Remove right margin */
+}
+.kpi-card {
+    background: linear-gradient(135deg, var(--secondary-bg) 50%, #f1f5f9 100%);
+    border-radius: 10px;
+    padding: 0.75rem;
+    box-shadow: 0 3px 12px var(--shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: center;
+    flex: 1;
+    min-width: 0; /* Prevent overflow */
+    margin: 0 2px; /* Small margin for separation */
+}
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--shadow);
+}
+.kpi-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--secondary-text);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-family);
+}
+.kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-text);
+    font-family: var(--font-family);
+}
+
+/* Sub-KPI cards */
+.kpi-sub-row {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin: 1.5rem 0;
+}
+.kpi-sub-card {
+    background: linear-gradient(135deg, #e0f2fe 50%, #fce7f3 100%);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px var(--shadow);
+    min-width: 180px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.kpi-sub-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow);
+}
+.kpi-sub-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--secondary-text);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-family);
+}
+.kpi-sub-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: var(--font-family);
+}
+
+/* Buttons */
+.stButton>button {
+    background-color: var(--accent);
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-family: var(--font-family);
+}
+.stButton>button:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-1px);
+}
+.stButton>button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+}
+
+/* Download button */
+.stDownloadButton>button {
+    background-color: var(--download-bg);
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    font-family: var(--font-family);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.stDownloadButton>button::before {
+    content: '↓'; /* Simple download icon */
+    font-size: 1rem;
+}
+.stDownloadButton>button:hover {
+    background-color: var(--download-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow);
+}
+.stDownloadButton>button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.3);
+}
+
+/* Date inputs */
+.stDateInput > div > input {
+    width: 45% !important;
+    max-width: 250px;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: var(--primary-text);
+    font-family: var(--font-family);
+    transition: border-color 0.2s ease;
+}
+.stDateInput > div > input:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+.stDateInput > label {
+    font-size: 0.95rem;
+    color: var(--secondary-text);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-family);
+}
+
+/* Multiselect and sliders */
+.stMultiSelect > div > div {
+    width: 45% !important;
+    max-width: 300px;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: var(--primary-text);
+    font-family: var(--font-family);
+}
+.stMultiSelect > label {
+    font-size: 0.95rem;
+    color: var(--secondary-text);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-family);
+}
+
+/* Table styling */
+table th {
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.75rem;
+    font-family: var(--font-family);
+}
+table td {
+    font-size: 0.9rem;
+    padding: 0.75rem;
+    text-align: center;
+    color: var(--primary-text);
+    font-family: var(--font-family);
+}
+
+/* Ensure compatibility with Streamlit's dark theme */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-bg: #1e293b;
+        --secondary-bg: #334155;
+        --primary-text: #f1f5f9;
+        --secondary-text: #94a3b8;
+        --border: #475569;
+    }
+    .kpi-card, .kpi-sub-card, table th {
+        background: linear-gradient(135deg, #334155 50%, #475569 100%);
+    }
+}
+
+/* Override Streamlit default padding and margin */
+.stApp {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+}

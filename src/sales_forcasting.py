@@ -46,6 +46,15 @@ def filter_data_by_cluster(df, cluster):
     return df
 
 
+def filter_data_by_country(df, country):
+    if country is not None:
+        print(f"Filtering data for country: {country}")
+        df = df[df['Country'] == country].copy()
+        print(f"Data filtered for country {country}, new shape: {df.shape}")
+    else:
+        print("No country filter applied.")
+    return df
+
 
 
 def prep_data_for_sales_forecasting(file_path, cluster=None,Country = None,  rolling_window=rolling_window, decomposition_period=decomposition_period):
@@ -55,20 +64,33 @@ def prep_data_for_sales_forecasting(file_path, cluster=None,Country = None,  rol
 
     
     if cluster is not None:
-        print("Loading data with clustering enabled.")
-          
-        df = load_data(file_path, with_cluster=True)
-        print(f"Data loaded with shape: {df.shape}")
-        # df = df[df['cluster'] == cluster].copy()
-        df = filter_data_by_country(df, Country)
-        print(f"Data filtered by country {Country}, new shape: {df.shape}")
-        df = filter_data_by_cluster(df, cluster)
-        print(f"Data filtered for cluster {cluster}, new shape: {df.shape}")
+        if Country is not None:
+
+            print("Loading data with clustering enabled.")
+            
+            df = load_data(file_path, with_cluster=True)
+            print(f"Data loaded with shape: {df.shape}")
+            df = filter_data_by_country(df, Country)
+            print(f"Data filtered by country {Country}, new shape: {df.shape}")
+            df = filter_data_by_cluster(df, cluster)
+            print(f"Data filtered for cluster {cluster}, new shape: {df.shape}")
+        else:
+            print("Loading data with clustering enabled but no country filter.")
+            df = load_data(file_path, with_cluster=True)
+            df = filter_data_by_cluster(df, cluster)
+            print(f"Data filtered for cluster {cluster}, new shape: {df.shape}")
+            
     
     else:
-        print("Loading data with clustering disabled.")
-        df = load_data(file_path, with_cluster=False)
-        df = filter_data_by_country(df, Country)
+
+        if Country is not None:
+            print("Loading data with clustering disabled.")
+            df = load_data(file_path, with_cluster=False)
+            df = filter_data_by_country(df, Country)
+        else:
+            print("Loading data with clustering disabled and no country filter.")
+            df = load_data(file_path, with_cluster=False)
+           
  
     print(f"before preprocessing, data shape: {df.shape}")
     df = preprocess_data(df)
@@ -86,6 +108,7 @@ def prep_data_for_sales_forecasting(file_path, cluster=None,Country = None,  rol
     df['TotalPrice'] = df['TotalPrice'].rolling(window=rolling_window).mean()
     df.dropna(inplace=True) 
     # Seasonal decomposition
+    print(f"checking observations for seasonal decomposition, data shape: {df.shape}")
     decomposition_smooth = seasonal_decompose(df, model='additive', period=decomposition_period)
     
     print(f"Data prepared for sales forecasting with shape: {df.shape}")
