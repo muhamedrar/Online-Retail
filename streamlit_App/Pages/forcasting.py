@@ -7,8 +7,10 @@ import configparser
 import os
 import sys
 
-# Adjust the path to src directory relative to the script location
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+# Debug path resolution
+src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
+print(f"Appending path to src: {src_path}")
+sys.path.append(src_path)
 
 def show_forecasting_page():
     st.title("📈 Sales Forecasting")
@@ -43,7 +45,7 @@ def show_forecasting_page():
         # Generate forecast (adjust based on your SalesForecaster's predict method)
         # Assuming predict returns a series or array; adjust if it returns a DataFrame
         forecast_values = forecaster.predict(future_steps=weeks_horizon)
-        last_date = pd.to_datetime('2025-06-11')  # Current date
+        last_date = pd.to_datetime('2025-06-12')  # Current date
         forecast_dates = pd.date_range(start=last_date + pd.Timedelta(days=1), periods=weeks_horizon, freq='D')
         forecast_df = pd.DataFrame({
             'date': forecast_dates,
