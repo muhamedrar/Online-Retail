@@ -112,7 +112,7 @@ def prep_data_for_sales_forecasting(file_path, cluster=None,Country = None,  rol
     decomposition_smooth = seasonal_decompose(df, model='additive', period=decomposition_period)
     
     print(f"Data prepared for sales forecasting with shape: {df.shape}")
-    return decomposition_smooth.trend.dropna(), decomposition_smooth.seasonal.dropna(), decomposition_smooth.resid.dropna()
+    return df, decomposition_smooth.trend.dropna(), decomposition_smooth.seasonal.dropna(), decomposition_smooth.resid.dropna()
 
 
 
@@ -122,7 +122,8 @@ def prep_data_for_sales_forecasting(file_path, cluster=None,Country = None,  rol
 
 class SalesForecaster:
     def __init__(self, filePath, order=order, seasonal_order=seasonal_order,cluster=None, Country=None):
-        trend, seasonal, resid = prep_data_for_sales_forecasting(filePath, cluster=cluster,Country=Country)
+        df ,trend, seasonal, resid = prep_data_for_sales_forecasting(filePath, cluster=cluster,Country=Country)
+        self.df = df 
         self.trend = trend.dropna()
         self.seasonal = seasonal.dropna()
         self.resid = resid.dropna()
@@ -135,7 +136,7 @@ class SalesForecaster:
         future_seasonal = self.seasonal[-future_steps:]
         future_final_forecast = future_forecast_resid + future_trend.values + future_seasonal.values
         # future dates
-        future_dates = pd.date_range(start=self.trend.index[-1] + pd.Timedelta(days=1), periods=future_steps, freq='D')
+        future_dates = pd.date_range(start=self.df.index[-1] , periods=future_steps+1, freq='D')[1:]
         future_final_forecast = pd.Series(future_final_forecast.values, index=future_dates)
         return future_final_forecast 
     

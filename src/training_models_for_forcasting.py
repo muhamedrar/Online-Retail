@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import warnings
 warnings.filterwarnings("ignore")
 import configparser
-from src.sales_forcasting import SalesForecaster
+from sales_forcasting import SalesForecaster
 
 
 
