@@ -14,57 +14,32 @@ config = configparser.ConfigParser()
 config.read('./config.ini')
 clusters = int(config['KmeansClustering']['n_clusters'])
 cluster_labels = [label.strip() for label in config['KmeansClustering']['cluster_labels'].split(',')]
-print(cluster_labels)
+print(f"Cluster labels: {cluster_labels}")
 
-# train model for each cluster 
 
+# Train a single global model for all data
+print("Training global model for all data...")
+forecaster = SalesForecaster('./Data/Online_Retail.csv')
+# Generate and print forecast
+forecast_values = forecaster.forecast(future_steps=30)  # Using 30 days as a sample
+print(f"Global Model Forecast (first 5 values):\n{forecast_values.head()}")
+# Export global model
+with open('./Models/sales_forecaster_global.pkl', 'wb') as f:
+    pickle.dump(forecaster, f)
+print("Global model trained and saved as ./Models/sales_forecaster_global.pkl")
+
+# Train one model per cluster
 for c in cluster_labels:
     print(f"Training model for cluster {c}")
-    forecaster = SalesForecaster('./Data/Online_Retail_Clustered.csv', cluster=c)
-    
-    # export model
-    with open(f'./Models/sales_forecaster_cluster_{c.replace(' ', '_')}.pkl', 'wb') as f:
-        pickle.dump(forecaster, f)
-    print(f"Model for cluster {c} trained and saved.")
-
-
-
-# Train model for all clusters combined
-forecaster = SalesForecaster('./Data/Online_Retail.csv')
-
-# export model
-with open('./Models/sales_forecaster.pkl', 'wb') as f:
-    pickle.dump(forecaster, f)
-
-
-
-## train model for each country (top 3 countries in the dataset)
-
-countries = ['United Kingdom', 'Germany', 'France']
-for country in countries:
-    print(f"Training model for country {country}")
-    forecaster = SalesForecaster('./Data/Online_Retail.csv', Country=country)
-    
-    # export model
-    with open(f'./Models/sales_forecaster_{country.replace(" ", "_")}.pkl', 'wb') as f:
-        pickle.dump(forecaster, f)
-
-
-# training models for combinitions of clusters and countries
-
-for cluster_label in cluster_labels:
-    for country in countries:
-        print(f"Training model for cluster {cluster_label} and country {country}")
-
-        try:
-            # Initialize and train the SalesForecaster
-            forecaster = SalesForecaster('./Data/Online_Retail_Clustered.csv', cluster=cluster_label, Country=country)
-            
-            # Export model with sanitized filename
-            filename = f'./Models/sales_forecaster_{cluster_label.replace(" ", "_")}_{country.replace(" ", "_")}.pkl'
-            with open(filename, 'wb') as f:
-                pickle.dump(forecaster, f)
-            print(f"Model for cluster {cluster_label} and country {country} trained and saved as {filename}")
-        except Exception as e:
-            print(f"Error training model for cluster {cluster_label} and country {country}: {str(e)}")
-            continue
+    try:
+        forecaster = SalesForecaster('./Data/Online_Retail_Clustered.csv', cluster=c)
+        # Generate and print forecast
+        forecast_values = forecaster.forecast(future_steps=30)  # Using 30 days as a sample
+        print(f"Forecast for cluster {c} (first 5 values):\n{forecast_values.head()}")
+        # Export cluster-specific model
+        with open(f'./Models/sales_forecaster_cluster_{c.replace(' ', '_')}.pkl', 'wb') as f:
+            pickle.dump(forecaster, f)
+        print(f"Model for cluster {c} trained and saved as ./Models/sales_forecaster_cluster_{c.replace(' ', '_')}.pkl")
+    except Exception as e:
+        print(f"Error training model for cluster {c}: {str(e)}")
+        continue
