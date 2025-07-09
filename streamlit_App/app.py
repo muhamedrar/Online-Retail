@@ -1,6 +1,6 @@
 # streamlit_app.py
 import streamlit as st
-from Pages import clustering, forcasting, insights
+from Pages import clustering, forcasting, insights , chatbot
 
 st.set_page_config(page_title="Online Retail Analytics", layout="wide")
 
@@ -39,3 +39,4 @@ elif page == "Sales Forecasting":
 
 elif page == "Strategic Recommendations":
     insights.show_insights_page()
+    chatbot.chatbot_ui()
