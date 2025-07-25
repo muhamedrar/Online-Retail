@@ -13,7 +13,7 @@ import ast
 from statsmodels.tsa.stattools import adfuller
 
 config = configparser.ConfigParser()
-config.read('./config.ini')
+config.read('../config.ini')
 
 rolling_window = int(config['DataPreprocessing']['rolling_window'])
 decomposition_period = int(config['DataPreprocessing']['decomposition_period'])
