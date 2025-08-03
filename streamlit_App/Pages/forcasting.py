@@ -48,12 +48,6 @@ def render_metric_cards(metrics):
                 box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
                 text-align: center;
                 flex: 1;
-                transition: transform 0.2s ease, box-shadow 0.2s ease;
-                cursor: help;
-            }
-            .kpi-card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
             }
             .kpi-label {
                 font-size: 1rem;
@@ -71,15 +65,15 @@ def render_metric_cards(metrics):
 
     st.markdown(f"""
         <div class="kpi-row">
-            <div class="kpi-card" title="Root Mean Square Error">
+            <div class="kpi-card">
                 <div class="kpi-label">RMSE</div>
                 <div class="kpi-value">{metrics.get('rmse', 0):.2f}</div>
             </div>
-            <div class="kpi-card" title="Mean Absolute Percentage Error">
+            <div class="kpi-card">
                 <div class="kpi-label">MAPE</div>
                 <div class="kpi-value">{metrics.get('mape', 0):.2f}%</div>
             </div>
-            <div class="kpi-card" title="R-squared Value">
+            <div class="kpi-card">
                 <div class="kpi-label">R²</div>
                 <div class="kpi-value">{metrics.get('r2', 0) * 100:.2f}%</div>
             </div>
@@ -87,7 +81,7 @@ def render_metric_cards(metrics):
     """, unsafe_allow_html=True)
 
 def show_forecasting_page():
-    st.title("Cluster-Based Sales Forecasting")
+    st.title("📈 Cluster-Based Sales Forecasting")
 
     data_file = '../Data/Online_Retail_Clustered.csv'
     df = load_data(data_file, with_cluster=True)
@@ -96,11 +90,11 @@ def show_forecasting_page():
     cluster_labels = [label.strip() for label in config['KmeansClustering']['cluster_labels'].split(',')]
 
     with st.sidebar:
-        st.header("Settings")
+        st.header("⚙️ Settings")
         cluster = st.selectbox("Choose a Cluster", ["All Clusters"] + cluster_labels)
         start_date = st.date_input("Start Date", value=pd.to_datetime(df['InvoiceDate']).min().date())
         end_date = st.date_input("End Date", value=pd.to_datetime(df['InvoiceDate']).max().date())
-        forecast_months = st.slider("Forecast Months", min_value=1, max_value=10, value=10)
+        forecast_months = st.slider("Forecast Months", min_value=1, max_value=10, value=6)
 
     df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
     if cluster != "All Clusters":
@@ -121,96 +115,106 @@ def show_forecasting_page():
             forecaster = pickle.load(f)
 
         forecast_values = forecaster.forecast(future_steps=299)
-
         if isinstance(forecast_values, pd.Series):
-            forecast_df = pd.DataFrame({
-                'date': forecast_values.index,
-                'Sales': forecast_values.values
-            })
+            forecast_df = pd.DataFrame({'date': forecast_values.index, 'Sales': forecast_values.values})
         else:
             last_date = historical_df['InvoiceDate'].max()
             forecast_dates = pd.date_range(start=last_date + pd.Timedelta(days=1), periods=len(forecast_values), freq='D')
-            forecast_df = pd.DataFrame({
-                'date': forecast_dates,
-                'Sales': forecast_values
-            })
+            forecast_df = pd.DataFrame({'date': forecast_dates, 'Sales': forecast_values})
 
         historical_df['InvoiceDate'] = pd.to_datetime(historical_df['InvoiceDate'])
-        filtered_hist = historical_df[
+        hist_filtered = historical_df[
             (historical_df['InvoiceDate'].dt.date >= start_date) &
             (historical_df['InvoiceDate'].dt.date <= end_date)
         ]
         start_forecast = forecast_df['date'].min()
         end_forecast = start_forecast + pd.DateOffset(months=forecast_months)
-        filtered_forecast = forecast_df[
+        forecast_filtered = forecast_df[
             (forecast_df['date'] >= start_forecast) &
             (forecast_df['date'] < end_forecast)
         ]
 
-        fig_forecast = go.Figure()
-        fig_forecast.add_trace(go.Scatter(
-            x=filtered_forecast['date'],
-            y=filtered_forecast['Sales'],
-            mode='lines+markers',
-            name='Forecast',
-            line=dict(color='#4CAF50', width=3),
-            marker=dict(size=5)
+        # Merge for comparison
+        hist_filtered = hist_filtered.rename(columns={'InvoiceDate': 'date', 'TotalPrice': 'Historical Sales'})
+        forecast_filtered = forecast_filtered.rename(columns={'Sales': 'Forecasted Sales'})
+        combined_df = pd.merge(hist_filtered, forecast_filtered, on='date', how='outer')
+
+        # Plot Forecast vs Historical
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=combined_df['date'],
+            y=combined_df['Historical Sales'],
+            mode='lines',
+            name='Historical Sales',
+            line=dict(color='#1f77b4', width=3)
         ))
-        fig_forecast.update_layout(
-            title=f"Forecasted Sales for {cluster}",
+        fig.add_trace(go.Scatter(
+            x=combined_df['date'],
+            y=combined_df['Forecasted Sales'],
+            mode='lines',
+            name='Forecasted Sales',
+            line=dict(color='#4CAF50', width=3, dash='dash')
+        ))
+        fig.update_layout(
+            title=f"Historical vs Forecasted Sales ({cluster})",
             xaxis_title="Date",
-            yaxis_title="Sales",
+            yaxis_title="Sales (£)",
             template="plotly_white",
             hovermode="x unified",
             legend=dict(orientation="h", x=0.5, xanchor="center")
         )
-        st.plotly_chart(fig_forecast)
+        st.plotly_chart(fig, use_container_width=True)
 
+        # Metrics
         if hasattr(forecaster, 'get_metrics'):
+            st.markdown("### 📏 Model Evaluation")
             metrics = forecaster.get_metrics()
-            st.markdown("### Model Evaluation")
             render_metric_cards(metrics)
 
-        fig_hist = go.Figure()
-        fig_hist.add_trace(go.Scatter(
-            x=filtered_hist['InvoiceDate'],
-            y=filtered_hist['TotalPrice'],
-            mode='lines+markers',
-            name='Historical Sales',
-            line=dict(color='#1f77b4', width=3),
-            marker=dict(size=5)
+        # Insights
+        avg_hist = hist_filtered['Historical Sales'].mean()
+        avg_fore = forecast_filtered['Forecasted Sales'].mean()
+        peak_fore = forecast_filtered.loc[forecast_filtered['Forecasted Sales'].idxmax()]
+
+        st.markdown("### 🔍 Key Insights")
+        st.info(f"""
+        - **Average historical sales**: £{avg_hist:,.2f}  
+        - **Average forecasted sales**: £{avg_fore:,.2f} ({'↑ Growth' if avg_fore > avg_hist else '↓ Decline'} expected)  
+        - **Peak forecasted sales**: £{peak_fore['Forecasted Sales']:.2f} on {peak_fore['date'].date()}  
+        """)
+
+        # Recommendations
+        st.markdown("### 💡 Strategic Recommendations")
+        if avg_fore > avg_hist:
+            st.success("Prepare for growth: increase stock levels, ramp up marketing before predicted peaks.")
+        else:
+            st.warning("Plan for slowdown: focus on customer retention, upselling, and targeted promotions.")
+
+        st.markdown("""
+        - Align inventory and staffing with demand trends.  
+        - Launch campaigns just before forecasted peaks to maximize sales.  
+        - Use cluster-specific customer insights to personalize offers.  
+        """)
+
+        # Heatmap
+        st.markdown("### 🔥 Cluster-Month Sales Heatmap")
+        fig_heatmap = go.Figure(data=go.Heatmap(
+            z=heatmap_df.values,
+            x=heatmap_df.columns,
+            y=heatmap_df.index,
+            colorscale='Viridis',
+            colorbar_title="Total Sales (£)",
+            text=heatmap_df.round(0).astype(int).astype(str),
+            hoverinfo='text'
         ))
-        fig_hist.update_layout(
-            title=f"Historical Sales for {cluster}",
-            xaxis_title="Date",
-            yaxis_title="Sales",
-            template="plotly_white",
-            hovermode="x unified",
-            legend=dict(orientation="h", x=0.5, xanchor="center")
+        fig_heatmap.update_traces(texttemplate="%{text}", textfont={"size": 12})
+        fig_heatmap.update_layout(
+            title="Total Sales by Cluster & Month",
+            xaxis_title="Month",
+            yaxis_title="Cluster",
+            template="plotly_white"
         )
-        st.plotly_chart(fig_hist)
+        st.plotly_chart(fig_heatmap, use_container_width=True)
 
     except Exception as e:
         st.error(f"Error generating forecast: {str(e)}")
-
-    st.markdown("### Cluster-Month Sales Heatmap")
-    fig_heatmap = go.Figure(data=go.Heatmap(
-        z=heatmap_df.values,
-        x=heatmap_df.columns,
-        y=heatmap_df.index,
-        colorscale='Viridis',
-        colorbar_title="Total Sales",
-        text=heatmap_df.round(0).astype(int).astype(str),
-        hoverinfo='text'
-    ))
-    fig_heatmap.update_traces(
-        texttemplate="%{text}",
-        textfont={"size": 12}
-    )
-    fig_heatmap.update_layout(
-        title="Total Sales by Cluster & Month",
-        xaxis_title="Month",
-        yaxis_title="Cluster",
-        template="plotly_white"
-    )
-    st.plotly_chart(fig_heatmap)
