@@ -1,0 +1,14 @@
+streamlit
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+plotly
+statsmodels
+pmdarima
+    pip install pmdarima --no-build-isolation 
+python-dotenv
+configparser
+google-generativeai
+dill
