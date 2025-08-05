@@ -1,5 +1,8 @@
 # **Online Retail Customer Segmentation & Sales Forecasting Dashboard**
 
+## 🌐 Live Demo
+🔗 **Project Link:** [Streamlit App Here](https://online-retail-segmentation-sales-forecasting.streamlit.app/)
+
 ## Overview
 
 This project is an end-to-end analytics solution for an online retail business, combining customer segmentation and cluster-based sales forecasting into a single, interactive Streamlit dashboard.
