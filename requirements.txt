@@ -6,8 +6,6 @@ matplotlib
 seaborn
 plotly
 statsmodels
-# pmdarima requires --no-build-isolation when installing via pip
-pmdarima
 python-dotenv
 configparser
 google-generativeai
