@@ -83,10 +83,10 @@ def render_metric_cards(metrics):
 def show_forecasting_page():
     st.title("📈 Cluster-Based Sales Forecasting")
 
-    data_file = '../Data/Online_Retail_Clustered.csv'
+    data_file = './Data/Online_Retail_Clustered.csv'
     df = load_data(data_file, with_cluster=True)
     config = configparser.ConfigParser()
-    config.read('../config.ini')
+    config.read('./config.ini')
     cluster_labels = [label.strip() for label in config['KmeansClustering']['cluster_labels'].split(',')]
 
     with st.sidebar:
@@ -104,7 +104,7 @@ def show_forecasting_page():
     heatmap_df = prepare_heatmap_data(df)
 
     model_key = "sales_forecaster_global" if cluster == "All Clusters" else f"sales_forecaster_cluster_{cluster.replace(' ', '_')}"
-    model_path = f"../Models/{model_key}.pkl"
+    model_path = f"./Models/{model_key}.pkl"
 
     try:
         if not os.path.exists(model_path):
