@@ -57,7 +57,8 @@ st.markdown("""
         }
         .meta {
             font-size: 0.65rem;
-            color: #6b7280;
+            color: #1f2d3d;
+            font-weight: bold; /* Highlight You and Assistant */
             margin-bottom: 4px;
         }
         .context-box {
@@ -153,8 +154,6 @@ def chatbot_ui():
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
 
-
-
     # Chat history container
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     for speaker, message in st.session_state.chat_history:
@@ -182,8 +181,9 @@ def chatbot_ui():
             )
             submit = st.form_submit_button("💬 Send")
     with col2:
-        if st.button("🧹 Clear Chat"):
+        if st.button("🧹 Clear Chat", key="clear_chat"):
             st.session_state.chat_history = []
+            st.rerun()
 
     # Handle submission
     if submit and user_input and user_input.strip():
@@ -193,6 +193,8 @@ def chatbot_ui():
             answer = query_gemini(prompt)
         st.session_state.chat_history.append(("You", question))
         st.session_state.chat_history.append(("Bot", answer))
+        st.rerun()  # Force UI update to display response immediately
 
     # Footer guidance
     st.markdown("<div class='footer'>Try: 'How do I retain Core Shoppers?', 'What campaign suits Premium Shoppers?', or 'Which cluster has early churn risk?'</div>", unsafe_allow_html=True)
+
