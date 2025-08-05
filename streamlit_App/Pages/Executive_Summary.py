@@ -171,7 +171,7 @@ def executive_summary_page():
     )
 
     # Load data
-    data_file = '../Data/Online_Retail_Clustered.csv'
+    data_file = './Data/Online_Retail_Clustered.csv'
     df = pd.read_csv(
         data_file,
         dtype={'InvoiceNo': str, 'StockCode': str, 'Description': str,
