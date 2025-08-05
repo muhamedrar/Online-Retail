@@ -107,7 +107,7 @@ The chatbot leverages project-specific segmentation and forecasting insights to 
 The project includes Jupyter notebooks for:
 
 * **EDA\_Clustering\_Results.ipynb** – Exploratory Data Analysis of clustering results.
-* **Clustering\_Techniques\_Experimentation.ipynb** – Testing different clustering algorithms.
+* **Clustering\_Techniques\_Experimentation.ipynb** – Testing Kmeans clustering algorithm.
 * **Forecasting\_Model\_Experimentation.ipynb** – Comparing forecasting methods.
 * **training\_models\_for\_forecasting.py** – Script to retrain models.
 
@@ -115,8 +115,20 @@ The project includes Jupyter notebooks for:
 
 ## Configuration
 
-The **`config.ini`** file contains project settings:
+The **`config.ini`** file contains project settings and parameters for clustering, data preprocessing, and forecasting:
 
+| Section             | Variable           | Description                                                                                   |
+|---------------------|-------------------|-----------------------------------------------------------------------------------------------|
+| `[KmeansClustering]`| `n_clusters`      | Number of customer clusters to generate using KMeans.                                         |
+|                     | `data_import_path`| Path to the raw input dataset.                                                                |
+|                     | `data_export_path`| Path to save the clustered dataset after segmentation.                                        |
+|                     | `cluster_labels`  | Names assigned to each customer segment (comma-separated).                                    |
+| `[DataPreprocessing]`| `rolling_window` | Window size (in days) for rolling average calculations during preprocessing.                  |
+|                     | `decomposition_period` | Period (in days) for time series decomposition (e.g., weekly seasonality).               |
+| `[ArimaForecasting]`| `order`           | ARIMA model order parameters: (p, d, q).                                                      |
+|                     | `seasonal_order`  | Seasonal ARIMA parameters: (P, D, Q, s), where s is the seasonality period (e.g., 7 for week).|
+
+**Example `config.ini`:**
 ```ini
 [KmeansClustering]
 n_clusters=5
@@ -151,8 +163,8 @@ seasonal_order=2,0,[1,2],7
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/online-retail-dashboard.git
-   cd online-retail-dashboard
+   git clone https://github.com/yourusername/Online-Retail.git
+   cd Online-Retail 
    ```
 
 2. Create and activate a virtual environment:
@@ -171,13 +183,9 @@ seasonal_order=2,0,[1,2],7
 
 4. Place the dataset `Online_Retail.csv` in the `Data/` directory.
 
-5. Preprocess data and run clustering:
 
-   ```bash
-   python src/data_preprocessing.py
-   ```
 
-6. Train forecasting models:
+5. Train forecasting models:
 
    ```bash
    python training_models_for_forecasting.py
